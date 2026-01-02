@@ -3,202 +3,351 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Notas Trimestrales</title>
-    <!-- Incluye Tailwind CSS para un diseño limpio y responsivo -->
+    <title>Sistema de Facturación Temu - 54 Artículos</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #e2e8f0;
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; padding: 0; }
         }
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type="number"] {
-            -moz-appearance: textfield;
-        }
+        .print-only { display: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #fb923c; border-radius: 10px; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4 md:p-8">
-    <div class="bg-white p-6 md:p-10 rounded-3xl shadow-2xl w-full max-w-2xl mx-auto border-4 border-slate-200">
-        <!-- Título y descripción -->
-        <div class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800">Calculadora de Notas</h1>
-            <p class="mt-2 text-slate-500 text-sm md:text-base">
-                Calcula tu nota final de manera visual y organizada.
-            </p>
-        </div>
+<body class="bg-gray-100 min-h-screen text-gray-800 font-sans">
 
-        <!-- Contenedor principal de notas - Estructura tipo tabla -->
-        <div class="space-y-6">
+    <!-- INTERFAZ DEL SISTEMA -->
+    <div class="no-print container mx-auto p-4 max-w-7xl">
+        <header class="bg-orange-600 text-white p-4 rounded-t-2xl shadow-lg flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">📦</span>
+                <div>
+                    <h1 class="text-xl font-bold uppercase">Facturación Global Temu</h1>
+                    <p class="text-xs opacity-90">Cargo de importación fijo: $2.25 por factura</p>
+                </div>
+            </div>
+            <div class="bg-orange-700 px-6 py-2 rounded-full border border-orange-400 mt-2 md:mt-0">
+                <span class="text-xs uppercase font-bold opacity-80">Total de Todas las Facturas:</span>
+                <span id="granTotalGlobal" class="text-2xl font-black ml-2">$0.00</span>
+            </div>
+        </header>
 
-            <!-- Sección de Actividades (70%) -->
-            <div class="bg-gray-50 p-6 rounded-2xl border-2 border-gray-200 shadow-inner">
-                <h2 class="text-xl font-bold text-gray-700 mb-4 flex items-center">
-                    Actividades y Deberes <span class="text-sm font-normal text-gray-500 ml-2">(70%)</span>
-                </h2>
-                <div id="grades-container" class="space-y-4">
-                    <!-- Fila de ejemplo para las notas -->
-                    <div class="grade-input flex items-center space-x-2">
-                        <input type="number" min="0" max="10" step="0.01" placeholder="Nota de actividad" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-200">
-                        <button onclick="removeGradeInput(this)" class="p-2 text-gray-400 hover:text-red-500 transition-colors duration-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.013 21H7.987a2 2 0 01-1.92-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1H9a1 1 0 00-1 1v3m10 0h-16" />
-                            </svg>
-                        </button>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4">
+            
+            <!-- COLUMNA 1: CATÁLOGO DE LOS 54 PRODUCTOS -->
+            <div class="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-gray-200 flex flex-col h-[750px]">
+                <div class="p-4 border-b">
+                    <h2 class="font-bold text-gray-700 mb-2 flex justify-between">
+                        Catálogo (54 Items)
+                        <span class="text-orange-600 text-sm" id="countCatalogo">0/54</span>
+                    </h2>
+                    <input type="text" id="searchProd" onkeyup="filtrarCatalogo()" placeholder="Buscar producto..." class="w-full p-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500">
+                </div>
+                <div id="listaCatalogo" class="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+                    <!-- Artículos cargados por JS -->
+                </div>
+            </div>
+
+            <!-- COLUMNA 2: GENERADOR DE FACTURA ACTUAL -->
+            <div class="lg:col-span-5 space-y-4">
+                <div class="bg-white p-5 rounded-2xl shadow-md border-2 border-orange-100">
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Seleccionar Persona:</label>
+                        <select id="selectPersona" class="w-full p-3 border border-gray-200 rounded-xl font-bold text-gray-700 bg-gray-50 focus:ring-2 focus:ring-orange-500">
+                            <!-- Personas cargadas por JS -->
+                        </select>
+                    </div>
+
+                    <div class="min-h-[300px] border rounded-xl p-2 bg-gray-50/50 mb-4">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-2 px-2">Productos en Factura:</h3>
+                        <div id="itemsFactura" class="space-y-2">
+                            <p id="msgVacio" class="text-center text-gray-400 text-sm py-10 italic">Haga clic en los productos del catálogo</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border space-y-2 shadow-inner">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Subtotal Artículos:</span>
+                            <span id="valSubtotal" class="font-bold">$0.00</span>
+                        </div>
+                        <div class="flex justify-between text-sm border-b pb-2">
+                            <span class="text-gray-500">Cargo Importación:</span>
+                            <span class="font-bold text-blue-600">+$2.25</span>
+                        </div>
+                        <div class="flex justify-between text-xl font-black pt-1">
+                            <span>TOTAL:</span>
+                            <span id="valTotal" class="text-orange-600">$0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 mt-4">
+                        <button onclick="guardarFactura()" class="bg-orange-500 text-white font-bold py-3 rounded-xl hover:bg-orange-600 transition shadow-lg shadow-orange-200">Guardar Factura</button>
+                        <button onclick="imprimirFactura()" class="bg-gray-800 text-white font-bold py-3 rounded-xl hover:bg-gray-900 transition">Imprimir</button>
                     </div>
                 </div>
-                <button id="add-grade-btn" class="mt-4 w-full p-3 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-md">
-                    + Agregar otra nota
-                </button>
             </div>
 
-            <!-- Sección de Examen y Proyecto con layout de grid -->
-            <div class="grid md:grid-cols-2 gap-6">
-                <!-- Nota del Examen (20%) -->
-                <div class="bg-gray-50 p-6 rounded-2xl border-2 border-gray-200 shadow-inner">
-                    <h2 class="text-xl font-bold text-gray-700 mb-4 flex items-center">
-                        Examen <span class="text-sm font-normal text-gray-500 ml-2">(20%)</span>
-                    </h2>
-                    <input id="exam-grade" type="number" min="0" max="10" step="0.01" placeholder="Nota del examen" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-200">
-                </div>
-                <!-- Nota del Proyecto (10%) -->
-                <div class="bg-gray-50 p-6 rounded-2xl border-2 border-gray-200 shadow-inner">
-                    <h2 class="text-xl font-bold text-gray-700 mb-4 flex items-center">
-                        Proyecto <span class="text-sm font-normal text-gray-500 ml-2">(10%)</span>
-                    </h2>
-                    <input id="project-grade" type="number" min="0" max="10" step="0.01" placeholder="Nota del proyecto" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-200">
+            <!-- COLUMNA 3: HISTORIAL -->
+            <div class="lg:col-span-3 bg-white p-4 rounded-2xl shadow-sm border border-gray-200 h-[750px] flex flex-col">
+                <h2 class="font-bold text-gray-700 mb-4 border-b pb-2">Facturas Guardadas</h2>
+                <div id="historialFacturas" class="flex-1 overflow-y-auto space-y-3 custom-scrollbar">
+                    <p class="text-gray-400 text-center text-xs py-10 italic">No hay facturas guardadas.</p>
                 </div>
             </div>
-        </div>
-
-        <!-- Botón de cálculo -->
-        <button id="calculate-btn" class="mt-8 w-full p-4 font-extrabold text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-lg transform hover:scale-105">
-            Calcular Nota Final
-        </button>
-
-        <!-- Sección de resultados y advertencia -->
-        <div id="result-area" class="mt-8 text-center p-6 md:p-8 bg-slate-100 rounded-2xl border-2 border-slate-300 shadow-inner hidden">
-            <h3 class="text-lg font-bold text-slate-600 uppercase tracking-wide">Nota Final</h3>
-            <p id="final-grade" class="text-5xl md:text-6xl font-extrabold text-slate-800 mt-2">0.00</p>
-            <p id="warning-message" class="mt-4 text-red-600 font-semibold text-sm hidden">
-                ¡Advertencia! La nota final es inferior a 7.
-            </p>
-            <p id="error-message" class="mt-4 text-red-600 font-semibold text-sm hidden"></p>
         </div>
     </div>
 
+    <!-- FORMATO DE IMPRESIÓN (OCULTO EN PANTALLA) -->
+    <div id="areaImpresion" class="print-only p-10 bg-white">
+        <div class="flex justify-between items-center border-b-2 border-orange-600 pb-4 mb-6">
+            <h1 class="text-4xl font-black italic text-orange-600">TEMU</h1>
+            <div class="text-right text-xs uppercase font-bold text-gray-500">
+                Comprobante de Entrega<br>ID: <span id="printID">001</span>
+            </div>
+        </div>
+        <div class="mb-6">
+            <p class="text-gray-400 text-[10px] font-black uppercase">Cliente:</p>
+            <p id="printCliente" class="text-2xl font-bold border-l-4 border-orange-500 pl-4">VALENTIN</p>
+        </div>
+        <table class="w-full mb-8">
+            <thead class="bg-gray-50">
+                <tr class="text-left text-[10px] uppercase text-gray-400">
+                    <th class="p-2">Artículo</th>
+                    <th class="p-2 text-right">Precio</th>
+                </tr>
+            </thead>
+            <tbody id="printBody"></tbody>
+        </table>
+        <div class="flex justify-end">
+            <div class="w-64 space-y-1">
+                <div class="flex justify-between text-sm">
+                    <span>Subtotal:</span>
+                    <span id="printSubtotal">$0.00</span>
+                </div>
+                <div class="flex justify-between text-sm text-blue-600 font-bold">
+                    <span>Cargos Importación:</span>
+                    <span>$2.25</span>
+                </div>
+                <div class="flex justify-between text-2xl font-black border-t-2 pt-2 border-gray-800">
+                    <span>TOTAL:</span>
+                    <span id="printTotal">$0.00</span>
+                </div>
+            </div>
+        </div>
+        <div class="mt-20 text-center text-[10px] text-gray-400 italic">Gracias por su compra a través del sistema de gestión TEMU.</div>
+    </div>
+
     <script>
-        // Obtiene referencias a los elementos del DOM
-        const gradesContainer = document.getElementById('grades-container');
-        const addGradeBtn = document.getElementById('add-grade-btn');
-        const calculateBtn = document.getElementById('calculate-btn');
-        const examGradeInput = document.getElementById('exam-grade');
-        const projectGradeInput = document.getElementById('project-grade');
-        const resultArea = document.getElementById('result-area');
-        const finalGradeEl = document.getElementById('final-grade');
-        const warningMessageEl = document.getElementById('warning-message');
-        const errorMessageEl = document.getElementById('error-message');
+        // --- BASE DE DATOS DE PRODUCTOS (54 Items extraídos del PDF) ---
+        const productos = [
+            { n: "Adaptador Audio 3.5mm U-Point", p: 1.03, e: "🔌" },
+            { n: "Zapatos de Mujer Cierre Sin Cordón", p: 8.21, e: "👟" },
+            { n: "Motocicleta Bburago 1:18 KTM 450", p: 12.71, e: "🏍️" },
+            { n: "Blusa Elegante Metálica Dorada", p: 6.84, e: "👕" },
+            { n: "Camisa Elegante Damas Negra", p: 6.95, e: "👚" },
+            { n: "Conjunto Chaleco Dinosaurio Niños", p: 5.60, e: "🦕" },
+            { n: "Spray Refrescante Oral 30ml Jaysuing", p: 2.95, e: "🧴" },
+            { n: "2 Pzas Cepillo Acero Inoxidable", p: 0.64, e: "🧽" },
+            { n: "Reloj Cuarzo Niños Estilo Nuevo", p: 3.19, e: "⌚" },
+            { n: "Conjunto 2 Pzas Niños Estampado", p: 6.35, e: "👦" },
+            { n: "Conjunto Verano Estampado 3D Palma", p: 6.95, e: "🌴" },
+            { n: "Reloj Cuarzo Moda Mujer Marrón", p: 1.68, e: "🕒" },
+            { n: "3 Pzas Juego Cepillos de Alambre", p: 1.10, e: "⚒️" },
+            { n: "Polvo Blanqueador HOOFUR 8D", p: 2.43, e: "🦷" },
+            { n: "Gafas Inalámbricas Inteligentes Altavoz", p: 6.75, e: "🕶️" },
+            { n: "Pack 2 Micrófonos Lavalier F15 Type-C", p: 14.15, e: "🎙️" },
+            { n: "Kit Soldador Eléctrico 80W 15-en-1", p: 15.17, e: "🔥" },
+            { n: "Micrófono Solapa Moreno 1-en-1", p: 7.40, e: "🎤" },
+            { n: "Alambre Soldar Industrial 30g", p: 1.59, e: "🧵" },
+            { n: "Funda Antigolpes Tecno Camon 40", p: 2.64, e: "📱" },
+            { n: "Cable Carga Rápida 4-en-1 USB-C", p: 2.90, e: "🔌" },
+            { n: "2 Bombillas LED Faros 8000K", p: 6.42, e: "💡" },
+            { n: "1000 Piezas Bandas de Goma", p: 1.35, e: "🧶" },
+            { n: "Funda iPhone 13 Pro Rosa BESTVIP", p: 3.62, e: "📱" },
+            { n: "Funda Teléfono Chic iPhone 13 Rosa", p: 3.06, e: "🌸" },
+            { n: "Mini Organizador Viaje Joyería Rosa", p: 3.61, e: "👝" },
+            { n: "Camiseta Casual Asimétrica Un Hombro", p: 5.88, e: "👕" },
+            { n: "Top Ajustado Plisado Amarillo", p: 8.98, e: "👗" },
+            { n: "Perfume Spray Corporal Vainilla/Coco", p: 3.35, e: "✨" },
+            { n: "6 Unidades Cintas Cabeza Mujer", p: 1.94, e: "🎀" },
+            { n: "Cable USB 3.0 a SATA Adaptador", p: 2.60, e: "💾" },
+            { n: "Tijera Sastre Alemana Alta Gama", p: 2.67, e: "✂️" },
+            { n: "Funda iPhone 12 Estampado Caballo", p: 1.90, e: "📱" },
+            { n: "Juego 5 Pzas Funda Transparente i11", p: 3.11, e: "🛡️" },
+            { n: "Set 13 Brochas Maquillaje Café", p: 7.41, e: "🖌️" },
+            { n: "Set 10 Aretes Colgantes Blancos", p: 3.00, e: "👂" },
+            { n: "Aretes Forma Margarita Ganchos", p: 1.42, e: "🌼" },
+            { n: "Pack 2 Gorros Satén Cabello", p: 2.83, e: "👒" },
+            { n: "800 Unidades Parches Adelgazantes", p: 2.12, e: "🩹" },
+            { n: "10 Clips Cabello Flores Aleatorias", p: 2.05, e: "🌺" },
+            { n: "Kit Herramienta Rotativa Ajustable", p: 13.30, e: "⚙️" },
+            { n: "Pulsera Trébol Moda Premium Blanco", p: 1.36, e: "🍀" },
+            { n: "Pulsera Trébol Moda Premium Negro", p: 1.35, e: "🍀" },
+            { n: "Adaptador Tipo C a USB 2.0 Mini", p: 0.76, e: "🔌" },
+            { n: "Adaptador iPhone 15/16 Pro Max", p: 2.75, e: "⚡" },
+            { n: "Gafas Antiluz Azul Púrpura Dorado", p: 3.13, e: "👓" },
+            { n: "Funda Familia Motociclista Redmi 13", p: 2.75, e: "📱" },
+            { n: "Funda Spark 20c Spark Go 2024", p: 1.74, e: "📲" },
+            { n: "Juego Joyería Collar Pulsera Dorado", p: 1.78, e: "👑" },
+            { n: "Faja Lumbar Ajustable Hombre/Mujer", p: 3.39, e: "🧘" },
+            { n: "3 Pzas Vidrio Templado Camon 40 Pro", p: 3.78, e: "💎" },
+            { n: "Hub USB 3.0 Ultra Delgado 4 Puertos", p: 3.07, e: "🔳" },
+            { n: "Base Expansión 11-en-1 4K HDMI", p: 11.73, e: "🖥️" },
+            { n: "Reproductor Música MP3 64GB Gris", p: 3.08, e: "🎵" }
+        ];
 
-        // Función para añadir un nuevo campo de nota de actividad
-        function addGradeInput() {
-            const newDiv = document.createElement('div');
-            newDiv.className = 'grade-input flex items-center space-x-2';
-            newDiv.innerHTML = `
-                <input type="number" min="0" max="10" step="0.01" placeholder="Nota de actividad" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-200">
-                <button onclick="removeGradeInput(this)" class="p-2 text-gray-400 hover:text-red-500 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.013 21H7.987a2 2 0 01-1.92-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1H9a1 1 0 00-1 1v3m10 0h-16" />
-                    </svg>
-                </button>
-            `;
-            gradesContainer.appendChild(newDiv);
-        }
+        const personas = ["VALENTIN", "KARLA", "PAULA", "ADRIAN", "AMIGO DE ADRIAN", "INGRID", "JAIME", "MECHE", "SEBASTIAN", "MATHIAS"];
+        const cargoImport = 2.25;
+        let carrito = [];
+        let facturasFinales = [];
+        let totalGlobal = 0;
 
-        // Función para eliminar un campo de nota de actividad
-        function removeGradeInput(button) {
-            const parentDiv = button.closest('.grade-input');
-            if (parentDiv) {
-                parentDiv.remove();
-            }
-        }
+        window.onload = () => {
+            cargarPersonas();
+            cargarCatalogo();
+        };
 
-        // Función principal para calcular la nota
-        function calculateGrade() {
-            let sumOfActivities = 0;
-            let countOfActivities = 0;
-            let errorMessage = '';
-
-            // Limpia mensajes de error y advertencia previos
-            errorMessageEl.classList.add('hidden');
-            warningMessageEl.classList.add('hidden');
-            resultArea.classList.add('hidden');
-
-            // Obtiene y valida las notas de actividades
-            const activityInputs = document.querySelectorAll('#grades-container input[type="number"]');
-            activityInputs.forEach(input => {
-                const grade = parseFloat(input.value);
-                if (!isNaN(grade) && grade >= 0 && grade <= 10) {
-                    sumOfActivities += grade;
-                    countOfActivities++;
-                } else if (input.value !== '') {
-                    errorMessage = 'Por favor, ingresa solo notas válidas entre 0 y 10 para las actividades.';
-                }
+        function cargarPersonas() {
+            const select = document.getElementById('selectPersona');
+            personas.sort().forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p; opt.innerText = p;
+                select.appendChild(opt);
             });
+        }
 
-            // Valida que al menos una nota de actividad haya sido ingresada
-            if (countOfActivities === 0 && errorMessage === '') {
-                errorMessage = 'Debes ingresar al menos una nota de actividad para calcular el promedio.';
-            }
+        function cargarCatalogo() {
+            const list = document.getElementById('listaCatalogo');
+            productos.forEach((p, idx) => {
+                const div = document.createElement('div');
+                div.className = "prod-item flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-100 hover:border-orange-300 hover:bg-orange-50 cursor-pointer transition text-xs";
+                div.innerHTML = `<div class="flex items-center gap-2"><span>${p.e}</span> <span>${p.n}</span></div><b class="text-orange-600 font-mono">$${p.p.toFixed(2)}</b>`;
+                div.onclick = () => añadirCarrito(idx);
+                list.appendChild(div);
+            });
+            document.getElementById('countCatalogo').innerText = `0/54`;
+        }
 
-            // Obtiene y valida la nota del examen
-            const examGrade = parseFloat(examGradeInput.value);
-            if (isNaN(examGrade) || examGrade < 0 || examGrade > 10) {
-                errorMessage = errorMessage || 'Por favor, ingresa una nota válida para el examen (entre 0 y 10).';
-            }
+        function filtrarCatalogo() {
+            const query = document.getElementById('searchProd').value.toLowerCase();
+            const items = document.querySelectorAll('.prod-item');
+            items.forEach(it => {
+                it.style.display = it.innerText.toLowerCase().includes(query) ? 'flex' : 'none';
+            });
+        }
 
-            // Obtiene y valida la nota del proyecto
-            const projectGrade = parseFloat(projectGradeInput.value);
-            if (isNaN(projectGrade) || projectGrade < 0 || projectGrade > 10) {
-                errorMessage = errorMessage || 'Por favor, ingresa una nota válida para el proyecto (entre 0 y 10).';
-            }
+        function añadirCarrito(idx) {
+            const p = productos[idx];
+            carrito.push({ ...p, idID: Date.now() });
+            actualizarUI();
+        }
+
+        function quitarCarrito(idID) {
+            carrito = carrito.filter(c => c.idID !== idID);
+            actualizarUI();
+        }
+
+        function actualizarUI() {
+            const container = document.getElementById('itemsFactura');
+            const msg = document.getElementById('msgVacio');
+            container.innerHTML = "";
             
-            // Si hay errores, los muestra y detiene el cálculo
-            if (errorMessage) {
-                errorMessageEl.textContent = errorMessage;
-                errorMessageEl.classList.remove('hidden');
-                resultArea.classList.remove('hidden');
-                finalGradeEl.textContent = '0.00';
+            if (carrito.length === 0) {
+                container.appendChild(msg);
+                document.getElementById('valSubtotal').innerText = "$0.00";
+                document.getElementById('valTotal').innerText = "$0.00";
                 return;
             }
 
-            // Calcula el promedio de actividades
-            const averageActivities = sumOfActivities / countOfActivities;
+            let sub = 0;
+            carrito.forEach(c => {
+                sub += c.p;
+                const d = document.createElement('div');
+                d.className = "flex justify-between items-center bg-white p-2 rounded-lg border text-xs shadow-sm";
+                d.innerHTML = `<span>${c.e} ${c.n}</span> <div class="flex items-center gap-2"><b>$${c.p.toFixed(2)}</b> <button onclick="quitarCarrito(${c.idID})" class="text-red-500 font-bold px-1">✕</button></div>`;
+                container.appendChild(d);
+            });
 
-            // Calcula la nota final con la fórmula ponderada
-            const finalGrade = (averageActivities * 0.70) + (examGrade * 0.20) + (projectGrade * 0.10);
-
-            // Muestra la nota final redondeada
-            finalGradeEl.textContent = finalGrade.toFixed(2);
-            resultArea.classList.remove('hidden');
-
-            // Muestra la advertencia si la nota es menor a 7
-            if (finalGrade < 7) {
-                warningMessageEl.classList.remove('hidden');
-            } else {
-                warningMessageEl.classList.add('hidden');
-            }
+            document.getElementById('valSubtotal').innerText = `$${sub.toFixed(2)}`;
+            document.getElementById('valTotal').innerText = `$${(sub + cargoImport).toFixed(2)}`;
         }
 
-        // Asocia las funciones a los botones
-        addGradeBtn.addEventListener('click', addGradeInput);
-        calculateBtn.addEventListener('click', calculateGrade);
+        function guardarFactura() {
+            if (carrito.length === 0) return alert("Factura vacía");
+            
+            const sub = carrito.reduce((a, b) => a + b.p, 0);
+            const fac = {
+                id: facturasFinales.length + 1,
+                cliente: document.getElementById('selectPersona').value,
+                items: [...carrito],
+                sub: sub,
+                total: sub + cargoImport
+            };
 
+            facturasFinales.unshift(fac);
+            totalGlobal += fac.total;
+            
+            carrito = [];
+            actualizarUI();
+            actualizarHistorial();
+        }
+
+        function actualizarHistorial() {
+            document.getElementById('granTotalGlobal').innerText = `$${totalGlobal.toFixed(2)}`;
+            const list = document.getElementById('historialFacturas');
+            list.innerHTML = "";
+
+            facturasFinales.forEach(f => {
+                const div = document.createElement('div');
+                div.className = "bg-orange-50 border border-orange-200 p-3 rounded-xl shadow-sm";
+                div.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <b class="text-xs text-orange-800">${f.cliente}</b>
+                        <b class="font-mono text-sm">$${f.total.toFixed(2)}</b>
+                    </div>
+                    <button onclick="reimprimir(${f.id})" class="text-[10px] bg-white border border-orange-200 px-2 py-1 rounded text-orange-600 hover:bg-orange-600 hover:text-white transition">Re-Imprimir</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function reimprimir(id) {
+            const f = facturasFinales.find(x => x.id === id);
+            llenarImpresion(f);
+            window.print();
+        }
+
+        function imprimirFactura() {
+            if (carrito.length === 0) return alert("Factura vacía");
+            const sub = carrito.reduce((a, b) => a + b.p, 0);
+            llenarImpresion({
+                id: "TEMP",
+                cliente: document.getElementById('selectPersona').value,
+                items: carrito,
+                sub: sub,
+                total: sub + cargoImport
+            });
+            window.print();
+        }
+
+        function llenarImpresion(f) {
+            document.getElementById('printID').innerText = f.id;
+            document.getElementById('printCliente').innerText = f.cliente;
+            document.getElementById('printSubtotal').innerText = `$${f.sub.toFixed(2)}`;
+            document.getElementById('printTotal').innerText = `$${f.total.toFixed(2)}`;
+            
+            const b = document.getElementById('printBody');
+            b.innerHTML = "";
+            f.items.forEach(i => {
+                const r = document.createElement('tr');
+                r.className = "border-b text-sm";
+                r.innerHTML = `<td class="p-2">${i.e} ${i.n}</td><td class="p-2 text-right font-mono">$${i.p.toFixed(2)}</td>`;
+                b.appendChild(r);
+            });
+        }
     </script>
 </body>
 </html>
